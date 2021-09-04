@@ -1,0 +1,47 @@
+{
+    "name": "solido/phpstan-rules",
+    "description": "PHPStan rules for Solido suite",
+    "type": "phpstan-extension",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alessandro Chitolina",
+            "email": "alekitto@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "kcs/class-finder": "^0.3"
+    },
+    "require-dev": {
+        "phpstan/extension-installer": "^1.0",
+        "phpstan/phpstan": "^0.12.23",
+        "phpunit/phpunit": "^9.5",
+        "solido/dto-management": "*",
+        "solido/php-coding-standards": "dev-master",
+        "roave/security-advisories": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Solido\\PHPStan\\": "lib/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "phpstan": {
+            "includes": [
+                "rules.neon"
+            ]
+        }
+    },
+    "archive": {
+        "exclude": [ ".github", "tests", ".gitignore" ]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
