@@ -3,7 +3,6 @@
 namespace Tests\Type;
 
 use PHPStan\Testing\TypeInferenceTestCase;
-use Solido\CodingStandards\PHPStan\Type\DtoResolverReturnTypeExtension;
 
 class DtoResolverReturnTypeExtensionTest extends TypeInferenceTestCase
 {

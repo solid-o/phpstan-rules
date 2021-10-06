@@ -6,8 +6,8 @@ namespace Tests\Rule\Construction;
 
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
-use Solido\CodingStandards\PHPStan\DTOClassMapFactory;
-use Solido\CodingStandards\PHPStan\Rule\Construction\DisallowConstructionOfDTOObjects;
+use Solido\PHPStan\DTOClassMapFactory;
+use Solido\PHPStan\Rule\Construction\DisallowConstructionOfDTOObjects;
 use Tests\Fixtures\DTO\Contracts\IgnoredInterface;
 
 class DisallowConstructionOfDTOObjectsTest extends RuleTestCase
