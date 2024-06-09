@@ -27,13 +27,10 @@ use function strtolower;
 
 class DisallowConstructionOfDTOObjects implements Rule
 {
-    private DTOClassMapFactory $dtoClassMapFactory;
-    private ReflectionProvider $reflectionProvider;
-
-    public function __construct(DTOClassMapFactory $dtoClassMapFactory, ReflectionProvider $reflectionProvider)
-    {
-        $this->dtoClassMapFactory = $dtoClassMapFactory;
-        $this->reflectionProvider = $reflectionProvider;
+    public function __construct(
+        private readonly DTOClassMapFactory $dtoClassMapFactory,
+        private readonly ReflectionProvider $reflectionProvider,
+    ) {
     }
 
     public function getNodeType(): string

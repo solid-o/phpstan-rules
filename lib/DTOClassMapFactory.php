@@ -30,8 +30,6 @@ use function strpos;
 class DTOClassMapFactory
 {
     /** @var string[] */
-    private array $dtoNamespaces;
-    /** @var string[] */
     private array $excludedInterfaces;
     /** @var string[] */
     private array $dtoClasses;
@@ -40,9 +38,11 @@ class DTOClassMapFactory
      * @param string[] $dtoNamespaces
      * @param string[] $excludedInterfaces
      */
-    public function __construct(array $dtoNamespaces, array $excludedInterfaces)
-    {
-        $this->dtoNamespaces = $dtoNamespaces;
+    public function __construct(
+        /** @var string[] */
+        private readonly array $dtoNamespaces,
+        array $excludedInterfaces,
+    ) {
         $this->excludedInterfaces = array_combine($excludedInterfaces, array_fill(0, count($excludedInterfaces), true));
 
         $this->buildMap();
