@@ -8,9 +8,8 @@ use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\Scope;
-use PHPStan\Broker\Broker;
 use PHPStan\Reflection\MethodReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
@@ -20,42 +19,46 @@ use function count;
 
 class DtoResolverReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
+    public function __construct(private ReflectionProvider $reflectionProvider)
+    {
+    }
+
     public function getClass(): string
     {
         return ResolverInterface::class;
     }
 
-    public function isMethodSupported(MethodReflection $reflection): bool
+    public function isMethodSupported(MethodReflection $methodReflection): bool
     {
-        return $reflection->getName() === 'resolve';
+        return $methodReflection->getName() === 'resolve';
     }
 
-    public function getTypeFromMethodCall(MethodReflection $reflection, MethodCall $methodCall, Scope $scope): Type
+    public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type
     {
+        $default = $methodReflection->getVariants()[0]->getReturnType();
         if (count($methodCall->args) === 0) {
-            return ParametersAcceptorSelector::selectSingle($reflection->getVariants())->getReturnType();
+            return $default;
         }
 
         $arg = $methodCall->args[0]->value;
         // Care only for ::class parameters, we can not guess types for random strings.
         if ($arg instanceof ClassConstFetch) {
-            $value = $scope->getType($methodCall->args[0]->value)->getValue();
+            $value = $arg->class->name;
         } elseif ($arg instanceof String_) {
             $value = $arg->value;
         } else {
-            return ParametersAcceptorSelector::selectSingle($reflection->getVariants())->getReturnType();
+            return $default;
         }
 
-        $broker = Broker::getInstance();
-        if (! $broker->hasClass($value)) {
-            return ParametersAcceptorSelector::selectSingle($reflection->getVariants())->getReturnType();
+        if (! $this->reflectionProvider->hasClass($value)) {
+            return $default;
         }
 
-        $classReflection = $broker->getClass($value);
+        $classReflection = $this->reflectionProvider->getClass($value);
         if (! $classReflection->isInterface()) {
-            return ParametersAcceptorSelector::selectSingle($reflection->getVariants())->getReturnType();
+            return $default;
         }
 
-        return new ObjectType($value);
+        return new ObjectType($value, null, $classReflection);
     }
 }

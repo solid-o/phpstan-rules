@@ -16,13 +16,13 @@ class DisallowConstructionOfDTOObjectsTest extends RuleTestCase
     {
         return new DisallowConstructionOfDTOObjects(new DTOClassMapFactory([
             'Tests\Fixtures\DTO',
-        ], [IgnoredInterface::class]), $this->createReflectionProvider());
+        ], [IgnoredInterface::class]), self::createReflectionProvider());
     }
 
     public function testShouldRaiseError(): void
     {
         $this->analyse([__DIR__.'/../../data/construction.php'], [[
-            'Instantiation of class Tests\Fixtures\DTO\v1\v1_0\ExampleDTO is disallowed: use the DTO resolver to create a new instance',
+            "Instantiation of class Tests\\Fixtures\\DTO\\v1\\v1_0\\ExampleDTO is disallowed\n    💡 Use the DTO resolver to create a new instance",
             10
         ]]);
     }

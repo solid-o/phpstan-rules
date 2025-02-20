@@ -25,13 +25,13 @@ use function is_string;
 use function preg_match;
 use function spl_autoload_functions;
 use function str_replace;
-use function strpos;
+use function str_starts_with;
 
 class DTOClassMapFactory
 {
-    /** @var string[] */
+    /** @var array<string, true> */
     private array $excludedInterfaces;
-    /** @var string[] */
+    /** @var array<string, true> */
     private array $dtoClasses;
 
     /**
@@ -74,7 +74,6 @@ class DTOClassMapFactory
         $finder->inNamespace($namespace);
         [$interfaces, $modelsByInterface] = $this->collectInterfaces($namespace, $finder);
 
-        /** @phpstan-var class-string[] $locators */
         $classes = [];
         foreach ($modelsByInterface as $interface => $versions) {
             if (! isset($interfaces[$interface])) {
@@ -88,8 +87,8 @@ class DTOClassMapFactory
     }
 
     /**
-     * @return array<string, ReflectionClass>|array<string, array<string, string>>[]
-     * @phpstan-return array{0: array<class-string, ReflectionClass>, 1: array<class-string, array<string, string>>}
+     * @return array<string, ReflectionClass>|array<string, array<string>>
+     * @phpstan-return array{0: array<class-string, ReflectionClass>, 1: array<class-string, array<class-string>>}
      */
     private function collectInterfaces(string $namespace, ComposerFinder $finder): array
     {
@@ -98,9 +97,7 @@ class DTOClassMapFactory
         $interfaces = [];
         $modelsByInterface = [];
 
-        /**
-         * @phpstan-var class-string $class
-         */
+        /** @phpstan-var class-string $class */
         foreach ($finder as $class => $reflector) {
             assert(is_string($class));
             assert($reflector instanceof ReflectionClass);
@@ -147,7 +144,7 @@ class DTOClassMapFactory
 
             $loader = $autoloadFn[0];
             $file = $loader->findFile(New_::class);
-            if ($file === false || strpos($file, 'phar://') !== 0) {
+            if ($file === false || ! str_starts_with($file, 'phar://')) {
                 return $loader;
             }
         }

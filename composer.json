@@ -16,7 +16,7 @@
     "require-dev": {
         "friendsofphp/proxy-manager-lts": "*",
         "phpstan/extension-installer": "^1.0",
-        "phpstan/phpstan": "^1.11",
+        "phpstan/phpstan": "^2.0",
         "phpunit/phpunit": "^10 || ^11",
         "solido/dto-management": "*",
         "solido/php-coding-standards": "dev-master",
@@ -34,7 +34,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.2.x-dev"
+            "dev-master": "0.4.x-dev"
         },
         "phpstan": {
             "includes": [

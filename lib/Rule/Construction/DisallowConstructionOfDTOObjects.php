@@ -14,7 +14,6 @@ use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\Constant\ConstantStringType;
-use PHPStan\Type\TypeUtils;
 use PHPStan\Type\TypeWithClassName;
 use Solido\PHPStan\DTOClassMapFactory;
 
@@ -38,24 +37,20 @@ class DisallowConstructionOfDTOObjects implements Rule
         return Node\Expr\New_::class;
     }
 
-    /**
-     * @return RuleError[]
-     */
+    /** @return RuleError[] */
     public function processNode(Node $node, Scope $scope): array
     {
         assert($node instanceof Node\Expr\New_);
 
         $errors = [];
         foreach ($this->getClassNames($node, $scope) as [$class, $isName]) {
-            array_push($errors, ...$this->checkClassName($class, $isName, $scope));
+            array_push($errors, ...$this->checkClassName($class, $isName, $node, $scope));
         }
 
         return $errors;
     }
 
-    /**
-     * @return array<int, array{string, bool}>
-     */
+    /** @return array<int, array{string, bool}> */
     private function getClassNames(Node\Expr\New_ $node, Scope $scope): array
     {
         if ($node->class instanceof Name) {
@@ -74,15 +69,13 @@ class DisallowConstructionOfDTOObjects implements Rule
         $type = $scope->getType($node->class);
 
         return array_merge(
-            array_map(static fn (ConstantStringType $type): array => [$type->getValue(), true], TypeUtils::getConstantStrings($type)),
-            array_map(static fn (string $name): array => [$name, false], TypeUtils::getDirectClassNames($type))
+            array_map(static fn (ConstantStringType $type): array => [$type->getValue(), true], $type->getConstantStrings()),
+            array_map(static fn (string $name): array => [$name, false], $type->getObjectClassNames()),
         );
     }
 
-    /**
-     * @return RuleError[]
-     */
-    private function checkClassName(string $class, bool $isName, Scope $scope): array
+    /** @return RuleError[] */
+    private function checkClassName(string $class, bool $isName, Node $node, Scope $scope): array
     {
         $lowercaseClass = strtolower($class);
 
@@ -125,6 +118,12 @@ class DisallowConstructionOfDTOObjects implements Rule
             return [];
         }
 
-        return [RuleErrorBuilder::message(sprintf('Instantiation of class %s is disallowed: use the DTO resolver to create a new instance', $classReflection->getDisplayName()))->build()];
+        return [
+            RuleErrorBuilder::message(sprintf('Instantiation of class %s is disallowed', $classReflection->getDisplayName()))
+                ->tip('Use the DTO resolver to create a new instance')
+                ->file($scope->getFile())
+                ->line($node->getStartLine())
+                ->build(),
+        ];
     }
 }

@@ -3,15 +3,16 @@
 namespace Tests\Type;
 
 use PHPStan\Testing\TypeInferenceTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class DtoResolverReturnTypeExtensionTest extends TypeInferenceTestCase
 {
     /**
-     * @dataProvider dataFileAsserts
      * @param string $assertType
      * @param string $file
      * @param mixed ...$args
      */
+    #[DataProvider('dataFileAsserts')]
     public function testFileAsserts(
         string $assertType,
         string $file,
@@ -21,9 +22,9 @@ class DtoResolverReturnTypeExtensionTest extends TypeInferenceTestCase
         $this->assertFileAsserts($assertType, $file, ...$args);
     }
 
-    public function dataFileAsserts(): iterable
+    public static function dataFileAsserts(): iterable
     {
-        yield from $this->gatherAssertTypes(__DIR__ . '/../data/dto_resolver.php');
+        yield from self::gatherAssertTypes(__DIR__ . '/../data/dto_resolver.php');
     }
 
     public static function getAdditionalConfigFiles(): array
