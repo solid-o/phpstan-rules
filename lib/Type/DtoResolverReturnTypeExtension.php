@@ -43,7 +43,7 @@ class DtoResolverReturnTypeExtension implements DynamicMethodReturnTypeExtension
         $arg = $methodCall->args[0]->value;
         // Care only for ::class parameters, we can not guess types for random strings.
         if ($arg instanceof ClassConstFetch) {
-            $value = $arg->class->name;
+            $value = $arg->class->name ?? implode('\\', $arg->class->getParts());
         } elseif ($arg instanceof String_) {
             $value = $arg->value;
         } else {
